@@ -1,29 +1,27 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-import { useMemo } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 
 export function Header() {
   const pathname = usePathname();
-
-  const crumbs = useMemo(() => {
-    const path = pathname.replace(/\/$/, '') || '/';
-    if (path === '/') return [];
-    const parts = path.split('/').filter(Boolean);
-    const result: { label: string; href: string }[] = [];
-    let accumulated = '';
-
-    for (const part of parts) {
-      accumulated += '/' + part;
-      result.push({ label: part, href: accumulated });
-    }
-    return result;
-  }, [pathname]);
+  const router = useRouter();
+  const isRoot = pathname === '/';
 
   return (
     <nav className="sticky top-0 z-40 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
-      <div className="relative flex h-10 items-center justify-between px-2">
+      <div className="relative flex h-10 items-center px-2">
         <div className="flex items-center gap-1 min-w-0">
+          {!isRoot && (
+            <button
+              onClick={() => router.back()}
+              aria-label="返回"
+              className="shrink-0 hover:opacity-80 transition-opacity p-1 -ml-1 text-muted-foreground hover:text-foreground"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-5">
+                <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
+              </svg>
+            </button>
+          )}
           <a href="/" className="shrink-0 hover:opacity-80 transition-opacity">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -32,24 +30,6 @@ export function Header() {
               className="h-6 w-6 rounded-full"
             />
           </a>
-          {crumbs.map((crumb, i) => (
-            <div key={crumb.href} className="inline-flex items-center gap-1">
-              <span className="text-muted-foreground/40 shrink-0">/</span>
-              <a
-                href={crumb.href}
-                className={`text-xs truncate shrink min-w-0 transition-colors ${
-                  i === crumbs.length - 1
-                    ? 'text-foreground font-medium'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {crumb.label}
-              </a>
-            </div>
-          ))}
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          {/* 空 div 保持布局平衡（原首页按钮移除） */}
         </div>
       </div>
     </nav>
