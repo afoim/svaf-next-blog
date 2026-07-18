@@ -11,7 +11,9 @@ export function Header() {
     if (path === '/') return [];
     const parts = path.split('/').filter(Boolean);
     const result: { label: string; href: string }[] = [];
-    let accumulated = '';
+    // basePath 是 /posts，pathname 已去掉此前缀，手动补回
+    let accumulated = '/posts';
+    result.push({ label: 'posts', href: accumulated });
     for (const part of parts) {
       accumulated += '/' + part;
       result.push({ label: part, href: accumulated });
@@ -48,13 +50,7 @@ export function Header() {
           ))}
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <a
-            href="/"
-            className="inline-flex items-center justify-center h-8 px-2 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-3.5 mr-1"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            首页
-          </a>
+          {/* 空 div 保持布局平衡（原首页按钮移除） */}
         </div>
       </div>
     </nav>

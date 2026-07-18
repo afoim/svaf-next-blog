@@ -111,7 +111,7 @@ export function PostsSearch({ posts }: { posts: PostEntry[] }) {
       ) : sorted.length === 0 ? (
         <p className="text-muted-foreground">暂无文章</p>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {sorted.map((post) => (
             <PostCard key={post.slug} post={post} />
           ))}
@@ -133,22 +133,22 @@ function PostCard({
   return (
     <a
       href={`/posts/${post.slug}/`}
-      className="group block rounded-lg border p-3 sm:p-5 hover:border-primary/50 hover:shadow-sm transition-all"
+      className="group block rounded-lg border p-3 sm:p-5 hover:border-primary/50 hover:shadow-sm transition-all h-full"
     >
-      <article className="flex gap-4 items-center">
+      <article className="flex flex-col gap-3">
         {post.image && (
-          <div className="shrink-0 self-center">
+          <div className="-mx-3 -mt-3 sm:-mx-5 sm:-mt-5 mb-1 overflow-hidden rounded-t-lg">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={post.image}
               alt={post.title}
-              className="h-20 w-28 sm:h-24 sm:w-36 rounded-md object-cover"
+              className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-300"
             />
           </div>
         )}
 
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2 flex-wrap leading-none">
+        <div className="flex-1 flex flex-col gap-2">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap leading-none">
             {post.pinned && (
               <>
                 <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400">
@@ -185,7 +185,7 @@ function PostCard({
 
           {post.description && (
             <p
-              className="mt-1 text-sm text-muted-foreground line-clamp-2"
+              className="text-sm text-muted-foreground line-clamp-2 mt-auto"
               dangerouslySetInnerHTML={{
                 __html: showScore && query ? highlight(post.description, query) : post.description,
               }}
@@ -194,7 +194,7 @@ function PostCard({
         </div>
 
         {showScore && post.score != null && (
-          <span className="shrink-0 self-start text-xs tabular-nums text-muted-foreground/60 pt-1">
+          <span className="shrink-0 self-start text-xs tabular-nums text-muted-foreground/60">
             {post.score} 匹配
           </span>
         )}

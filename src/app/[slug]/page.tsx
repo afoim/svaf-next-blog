@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { fetchPost, getAllSlugs } from '@/lib/content';
 import { PostBody } from '@/components/PostBody';
 import { PageViews } from '@/components/PageViews';
@@ -5,9 +6,43 @@ import { Giscus } from '@/components/Giscus';
 import { TableOfContents } from '@/components/TableOfContents';
 import { MobileTableOfContents } from '@/components/MobileTableOfContents';
 
+const SITE_URL = 'https://2x.nz';
+
 export async function generateStaticParams() {
   const slugs = await getAllSlugs();
   return slugs.map((slug) => ({ slug }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await fetchPost(slug);
+  if (!post) return { title: '文章未找到' };
+
+  const url = `${SITE_URL}/posts/${slug}/`;
+  const tags = post.tags.length > 0 ? [...post.tags] : undefined;
+  if (post.category) tags?.push(post.category);
+
+  return {
+    title: post.title,
+    description: post.description || undefined,
+    keywords: tags,
+    alternates: { canonical: url },
+    openGraph: {
+      type: 'article',
+      title: post.title,
+      description: post.description || undefined,
+      url,
+      images: post.image ? [{ url: post.image }] : undefined,
+      publishedTime: post.published || undefined,
+      tags: post.tags.length > 0 ? post.tags : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.description || undefined,
+      images: post.image ? [post.image] : undefined,
+    },
+  };
 }
 
 function viewBoxIcon(d: string, viewBox = "0 0 24 24") {
@@ -37,7 +72,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   return (
     <main className="container mx-auto max-w-6xl px-4 py-8">
       <div className="flex gap-8 relative">
-        <article className="flex-1 min-w-0 max-w-2xl mx-auto">
+        <article className="flex-1 min-w-0 max-w-2xl mx-auto xl:mx-0 xl:max-w-none">
           <a
             href="/posts"
             className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
@@ -98,6 +133,35 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           </header>
 
           <PostBody html={post.html} />
+
+          {/* JSON-LD structured data */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'BlogPosting',
+                headline: post.title,
+                description: post.description || undefined,
+                image: post.image || undefined,
+                datePublished: post.published || undefined,
+                author: {
+                  '@type': 'Person',
+                  name: '二叉树树',
+                  url: 'https://2x.nz/',
+                },
+                publisher: {
+                  '@type': 'Person',
+                  name: '二叉树树',
+                },
+                mainEntityOfPage: {
+                  '@type': 'WebPage',
+                  '@id': `${SITE_URL}/posts/${slug}/`,
+                },
+                keywords: post.tags.length > 0 ? post.tags.join(', ') : undefined,
+              }),
+            }}
+          />
 
           <Giscus />
         </article>

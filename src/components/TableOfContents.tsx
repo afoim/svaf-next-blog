@@ -88,7 +88,14 @@ export function TableOfContents({ className }: TableOfContentsProps) {
     return () => window.removeEventListener("scroll", update);
   }, [headings]);
 
-  if (headings.length === 0) return null;
+  if (headings.length === 0) {
+    return (
+      <div className={cn("space-y-2", className)}>
+        <h4 className="text-sm font-semibold text-foreground mb-4">本页目录</h4>
+        <p className="text-xs text-muted-foreground/60">无标题，暂无法生成目录</p>
+      </div>
+    );
+  }
 
   return (
     <div className={cn("space-y-2", className)}>
