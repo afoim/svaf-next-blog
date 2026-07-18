@@ -1,6 +1,4 @@
-media:
-  - path: assets/img
-    public_path: /img
+media: img
 
 actions:
   - name: deploy
