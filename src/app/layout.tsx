@@ -4,7 +4,7 @@ import './globals.css';
 import '@/styles/hljs.css';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import { Footer, Analytics, CookieConsent } from '@svaf/shared';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -78,6 +78,8 @@ export default function RootLayout({
           </div>
           <Footer />
         </ThemeProvider>
+        <Analytics />
+        <CookieConsent />
       </body>
     </html>
   );

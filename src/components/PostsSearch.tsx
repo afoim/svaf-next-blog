@@ -1,7 +1,10 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from '@/components/ui/icon';
+import { NumberTicker } from '@/components/ui/number-ticker';
+
+const VIEWS_API = 'https://t.2x.nz/batch';
 
 export interface PostEntry {
   slug: string;
@@ -23,9 +26,54 @@ function highlight(text: string, query: string): string {
   );
 }
 
+/** 客户端缓存 views（与 PageViews 共享，避免重复请求） */
+const viewsCache = new Map<string, number>();
+
 export function PostsSearch({ posts }: { posts: PostEntry[] }) {
   const [query, setQuery] = useState('');
+  const [viewsMap, setViewsMap] = useState<Record<string, number>>({});
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // 批量查询所有文章的浏览量
+  useEffect(() => {
+    const slugs = posts.map((p) => p.slug);
+    const uncached = slugs.filter((s) => !viewsCache.has(s));
+    if (uncached.length === 0) {
+      const map: Record<string, number> = {};
+      for (const slug of slugs) {
+        const v = viewsCache.get(slug);
+        if (v !== undefined) map[slug] = v;
+      }
+      setViewsMap(map);
+      return;
+    }
+
+    const pathnames = uncached.map((s) => `/posts/${s}/`);
+    fetch(VIEWS_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(pathnames),
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: number[] | null) => {
+        if (!data) return;
+        const map: Record<string, number> = {};
+        for (const slug of slugs) {
+          const v = viewsCache.get(slug);
+          if (v !== undefined) {
+            map[slug] = v;
+          }
+        }
+        uncached.forEach((slug, i) => {
+          if (data[i] != null) {
+            viewsCache.set(slug, data[i]);
+            map[slug] = data[i];
+          }
+        });
+        setViewsMap(map);
+      })
+      .catch(() => {});
+  }, [posts]);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -103,7 +151,7 @@ export function PostsSearch({ posts }: { posts: PostEntry[] }) {
           ) : (
             <div className="flex flex-col gap-4">
               {results?.map((post) => (
-                <PostCard key={post.slug} post={post} query={query} showScore />
+                <PostCard key={post.slug} post={post} query={query} showScore views={viewsMap[post.slug]} />
               ))}
             </div>
           )}
@@ -113,7 +161,7 @@ export function PostsSearch({ posts }: { posts: PostEntry[] }) {
       ) : (
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {sorted.map((post) => (
-            <PostCardGrid key={post.slug} post={post} />
+            <PostCardGrid key={post.slug} post={post} views={viewsMap[post.slug]} />
           ))}
         </div>
       )}
@@ -121,7 +169,7 @@ export function PostsSearch({ posts }: { posts: PostEntry[] }) {
   );
 }
 
-function PostCardGrid({ post }: { post: PostEntry }) {
+function PostCardGrid({ post, views }: { post: PostEntry; views?: number }) {
   return (
     <a
       href={`/posts/${post.slug}/`}
@@ -160,6 +208,18 @@ function PostCardGrid({ post }: { post: PostEntry }) {
                 <span className="text-xs text-muted-foreground">{post.category}</span>
               </>
             )}
+            {views !== undefined && (
+              <>
+                <span aria-hidden>·</span>
+                <span className="inline-flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-3.5">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  <NumberTicker value={views} />
+                </span>
+              </>
+            )}
             {post.tags.length > 0 && (
               <>
                 <span aria-hidden>·</span>
@@ -183,10 +243,12 @@ function PostCard({
   post,
   query,
   showScore,
+  views,
 }: {
   post: PostEntry & { score?: number };
   query?: string;
   showScore?: boolean;
+  views?: number;
 }) {
   return (
     <a
@@ -224,6 +286,18 @@ function PostCard({
               <>
                 <span aria-hidden>·</span>
                 <span className="text-xs text-muted-foreground">{post.category}</span>
+              </>
+            )}
+            {views !== undefined && (
+              <>
+                <span aria-hidden>·</span>
+                <span className="inline-flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-3.5">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  <NumberTicker value={views} />
+                </span>
               </>
             )}
             {post.tags.length > 0 && (
