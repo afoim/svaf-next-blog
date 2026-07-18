@@ -132,7 +132,7 @@ function PostCard({
 }) {
   return (
     <a
-      href={`/${post.slug}/`}
+      href={`/posts/${post.slug}/`}
       className="group block rounded-lg border p-3 sm:p-5 hover:border-primary/50 hover:shadow-sm transition-all h-full"
     >
       <article className="flex flex-col gap-3">

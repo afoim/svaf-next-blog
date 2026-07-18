@@ -64,7 +64,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       <main className="container mx-auto max-w-2xl px-4 py-16 text-center">
         <h1 className="text-6xl font-bold mb-4">404</h1>
         <p className="text-muted-foreground mb-8">文章未找到</p>
-        <a href="/" className="text-primary hover:underline">返回博客列表</a>
+        <a href="/posts" className="text-primary hover:underline">返回博客列表</a>
       </main>
     );
   }
@@ -74,7 +74,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       <div className="flex gap-8 relative">
         <article className="flex-1 min-w-0 max-w-2xl mx-auto xl:mx-0 xl:max-w-none">
           <a
-            href="/"
+            href="/posts"
             className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
           >
             <span className="inline-flex items-center justify-center shrink-0 leading-none size-4">{viewBoxIcon("m12 19-7-7 7-7M19 12H5")}</span>
