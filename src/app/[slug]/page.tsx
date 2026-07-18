@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { fetchPost, getAllSlugs } from '@/lib/content';
+import { extractHeadings } from '@/lib/toc';
 import { PostBody } from '@/components/PostBody';
 import { PageViews } from '@/components/PageViews';
 import { Giscus } from '@/components/Giscus';
@@ -68,6 +69,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       </main>
     );
   }
+
+  const headings = extractHeadings(post.html);
 
   return (
     <main className="container mx-auto max-w-6xl px-4 py-8">
@@ -169,12 +172,12 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         <aside className="hidden xl:block w-[350px] flex-shrink-0 p-6 bg-muted/60 dark:bg-muted/20 rounded-lg">
           <div className="sticky top-20 space-y-8">
             <div className="border border-border rounded-lg p-6 bg-card">
-              <TableOfContents />
+              <TableOfContents headings={headings} />
             </div>
           </div>
         </aside>
       </div>
-      <MobileTableOfContents />
+      <MobileTableOfContents headings={headings} />
     </main>
   );
 }

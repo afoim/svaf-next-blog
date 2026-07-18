@@ -3,8 +3,13 @@
 import React from "react";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerBody } from "@/components/ui/drawer";
 import { TableOfContents } from "@/components/TableOfContents";
+import type { Heading } from "@/lib/toc";
 
-export function MobileTableOfContents() {
+interface Props {
+  headings: Heading[];
+}
+
+export function MobileTableOfContents({ headings }: Props) {
   return (
     <Drawer>
       <DrawerTrigger className="lg:hidden fixed bottom-6 right-6 z-50 bg-primary text-primary-foreground p-3 rounded-full shadow-lg hover:bg-primary/90 transition-colors">
@@ -17,7 +22,7 @@ export function MobileTableOfContents() {
         </DrawerHeader>
 
         <DrawerBody>
-          <TableOfContents />
+          <TableOfContents headings={headings} />
         </DrawerBody>
       </DrawerContent>
     </Drawer>

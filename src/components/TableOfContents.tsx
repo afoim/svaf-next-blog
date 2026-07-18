@@ -1,55 +1,25 @@
-"use client";
+'use client';
 
-import React, { useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
-
-interface Heading {
-  id: string;
-  text: string;
-  level: number;
-}
+import { useEffect, useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
+import type { Heading } from '@/lib/toc';
 
 interface TableOfContentsProps {
   className?: string;
+  headings: Heading[];
 }
 
-export function TableOfContents({ className }: TableOfContentsProps) {
-  const [headings, setHeadings] = useState<Heading[]>([]);
-  const [activeId, setActiveId] = useState<string>("");
+export function TableOfContents({ className, headings }: TableOfContentsProps) {
+  const [activeId, setActiveId] = useState<string>('');
   const activeRef = useRef(activeId);
   activeRef.current = activeId;
 
-  useEffect(() => {
-    const scan = () => {
-      const els = document.querySelectorAll("h1, h2");
-      const arr: Heading[] = [];
-      els.forEach((el) => {
-        if (el.id) {
-          arr.push({
-            id: el.id,
-            text: el.textContent || "",
-            level: parseInt(el.tagName.charAt(1)),
-          });
-        }
-      });
-      setHeadings(arr);
-    };
-
-    scan();
-
-    const article = document.querySelector("article");
-    if (article) {
-      const observer = new MutationObserver(() => scan());
-      observer.observe(article, { childList: true, subtree: true });
-      return () => observer.disconnect();
-    }
-  }, []);
-
+  // 滚动高亮追踪（必须客户端）
   useEffect(() => {
     if (headings.length === 0) return;
 
     const update = () => {
-      let best = "";
+      let best = '';
       let bestTop = Infinity;
 
       for (const h of headings) {
@@ -63,7 +33,7 @@ export function TableOfContents({ className }: TableOfContentsProps) {
       }
 
       if (!best) {
-        let lastAbove = "";
+        let lastAbove = '';
         let lastAboveTop = -Infinity;
         for (const h of headings) {
           const el = document.getElementById(h.id);
@@ -78,19 +48,17 @@ export function TableOfContents({ className }: TableOfContentsProps) {
       }
 
       if (!best && headings.length > 0) best = headings[0].id;
-
       if (best && best !== activeRef.current) setActiveId(best);
     };
 
-    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener('scroll', update, { passive: true });
     update();
-
-    return () => window.removeEventListener("scroll", update);
+    return () => window.removeEventListener('scroll', update);
   }, [headings]);
 
   if (headings.length === 0) {
     return (
-      <div className={cn("space-y-2", className)}>
+      <div className={cn('space-y-2', className)}>
         <h4 className="text-sm font-semibold text-foreground mb-4">本页目录</h4>
         <p className="text-xs text-muted-foreground/60">无标题，暂无法生成目录</p>
       </div>
@@ -98,7 +66,7 @@ export function TableOfContents({ className }: TableOfContentsProps) {
   }
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn('space-y-2', className)}>
       <h4 className="text-sm font-semibold text-foreground mb-4">本页目录</h4>
       <nav>
         <ul className="space-y-2">
@@ -110,13 +78,13 @@ export function TableOfContents({ className }: TableOfContentsProps) {
                   e.preventDefault();
                   const el = document.getElementById(heading.id);
                   if (el) {
-                    el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   }
-                  window.history.pushState({}, "", `#${heading.id}`);
+                  window.history.pushState({}, '', `#${heading.id}`);
                 }}
                 className={cn(
-                  "block w-full text-left text-sm transition-colors hover:text-foreground text-muted-foreground no-underline",
-                  activeId === heading.id && "text-primary font-medium underline underline-offset-4",
+                  'block w-full text-left text-sm transition-colors hover:text-foreground text-muted-foreground no-underline',
+                  activeId === heading.id && 'text-primary font-medium underline underline-offset-4',
                 )}
               >
                 {heading.text}
