@@ -1,0 +1,41 @@
+media: assets/img
+
+actions:
+  - name: deploy
+    label: Deploy to Cloudflare
+    workflow: deploy.yml
+    ref: main
+    confirm:
+      title: 部署到 Cloudflare Pages？
+      message: 将部署站点到 Cloudflare Pages。
+      button: Deploy
+
+content:
+  - name: posts
+    label: Posts
+    type: collection
+    actions:
+      - name: broadcast
+        label: 广播此文章
+        workflow: post-bc.yml
+        ref: main
+        scope: entry
+        confirm:
+          title: 广播此文章？
+          message: 将推送通知到 QQ 群和邮件订阅。
+          button: 广播
+    path: posts
+    filename:
+      template: "{primary}.md"
+      field: true
+    view:
+      fields: [ title, coverImage, draft, date ]
+    fields:
+      - { name: title, label: Title, type: string, required: true }
+      - { name: description, label: Description, type: string }
+      - { name: coverImage, label: 封面图, type: image }
+      - { name: date, label: Date, type: date }
+      - { name: draft, label: Draft, type: boolean }
+      - { name: pin, label: 置顶, type: boolean }
+      - { name: tags, label: Tags, type: string, list: true }
+      - { name: body, label: Body, type: rich-text }

@@ -1,0 +1,87 @@
+name: Post Broadcast
+
+on:
+  workflow_dispatch:
+    inputs:
+      payload:
+        description: Pages CMS payload as JSON
+        required: true
+        type: string
+
+jobs:
+  broadcast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Send broadcast
+        env:
+          PAYLOAD: ${{ inputs.payload }}
+          BOT_WEBHOOK: ${{ secrets.ANNOUNCE_WEBHOOK_URL }}
+          FORUM_WEBHOOK: ${{ secrets.FORUM_WEBHOOK_URL }}
+          SECRET: ${{ secrets.ANNOUNCE_SECRET }}
+        shell: node {0}
+        run: |
+          const fs = require('fs');
+          const p = JSON.parse(process.env.PAYLOAD);
+          const ctx = p.context || {};
+          const path = ctx.path || '';
+          const slug = path.replace(/\.md$/, '').split('/').pop();
+
+          let title = slug;
+          let desc = '';
+          try {
+            const content = fs.readFileSync(path, 'utf8');
+            const fm = content.match(/^---\s*\n([\s\S]*?)\n---\s*\n/);
+            if (fm) {
+              const get = (key) => {
+                const m = fm[1].match(new RegExp(`^${key}:\\s*(.+)$`, 'm'));
+                return m ? m[1].replace(/^["']|["']$/g, '').trim() : '';
+              };
+              title = get('title') || slug;
+              desc = get('description') || '';
+            }
+          } catch (e) {
+            title = ctx.data?.title || slug;
+            desc = ctx.data?.description || '';
+          }
+
+          const summary = desc || '博客更新';
+          const url = `https://2x.nz/posts/${slug}/`;
+
+          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          console.log('  文章广播推送');
+          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+          console.log(`  文章:  ${slug}`);
+          console.log(`  标题:  ${title}`);
+          console.log(`  描述:  ${desc}`);
+          console.log(`  URL:   ${url}\n`);
+
+          const body = JSON.stringify({ title, summary, url });
+
+          async function send(webhook, label) {
+            console.log(`  → 发送到 ${label}...`);
+            const resp = await fetch(webhook, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Announce-Secret': process.env.SECRET,
+              },
+              body,
+            });
+            const text = await resp.text();
+            if (resp.ok) {
+              console.log(`  ✅ ${label} 成功 (${resp.status})`);
+              try { console.log(`  响应: ${JSON.stringify(JSON.parse(text), null, 2)}`); }
+              catch { console.log(`  响应: ${text}`); }
+            } else {
+              console.error(`  ❌ ${label} 失败 (${resp.status}): ${text}`);
+              throw new Error(`${label} 失败`);
+            }
+          }
+
+          (async () => {
+            await send(process.env.BOT_WEBHOOK, 'Bot 广播');
+            await send(process.env.FORUM_WEBHOOK, '论坛邮件');
+            console.log('\n  ✅ 全部推送完成\n');
+          })();
