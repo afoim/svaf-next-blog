@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     alternates: { canonical: url },
     openGraph: {
       type: 'article',
-      title: post.title,
+      title: `posts/${slug}/`, // Giscus 使用 og:title 做 discussion 匹配
       description: post.description || undefined,
       url,
       images: post.image ? [{ url: post.image }] : undefined,
