@@ -97,7 +97,7 @@ function scanLocalPosts(): PostMeta[] {
   for (const file of files) {
     const raw = readFileSync(join(dir, file), 'utf-8');
     const slug = file.replace(/\.md$/, '');
-    const match = raw.match(/^---\n([\s\S]*?)\n---\n/);
+    const match = raw.match(/^---[\r]?\n([\s\S]*?)\n---[\r]?\n/);
     if (!match) continue;
 
     const fm = parseFrontmatter(match[1]);
