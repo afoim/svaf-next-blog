@@ -11,9 +11,7 @@ export function Header() {
     if (path === '/') return [];
     const parts = path.split('/').filter(Boolean);
     const result: { label: string; href: string }[] = [];
-    // basePath 是 /posts，pathname 已去掉此前缀，手动补回
-    let accumulated = '/posts';
-    result.push({ label: 'posts', href: accumulated });
+    let accumulated = '';
     for (const part of parts) {
       accumulated += '/' + part;
       result.push({ label: part, href: accumulated });
