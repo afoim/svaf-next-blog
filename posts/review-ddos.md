@@ -1,12 +1,11 @@
 ---
 title: 连着被打了4个月，来做一个彻头彻尾的复盘吧！
-date: '2026-02-10'
 description: 自25年11月至今，该网站被连续不断攻击了总计高达几百TiB，攻击峰值高达6.8Gbps，且攻击者从最开始的纯印度IP攻击到如今的纯中国大陆IP攻击。今天，就跟大家谈谈攻击者为什么要攻击，他们想得到什么，以及如何防范DDOS
-draft: false
-tags: []
 coverImage: /img/review-ddos-review-ddos-5.png
+date: 2026-02-10
+draft: false
+pin: false
 ---
-
 # 引言
 
 本站建站初使用 **静态** 架构就是防止别有用心之人进行DDoS
@@ -49,7 +48,7 @@ coverImage: /img/review-ddos-review-ddos-5.png
 
 于 **2025年12月16号 11:13**，我在和我的朋友测试项目的时候，有一个知识点他忘记了，我提议他前往我的博客查看，却被告知博客访问报 **570** 状态码
 
-我立即使用 https://itdog.cn 测试了我的博客网站 https://acofork.com 发现大部分节点都为 **570** 状态码
+我立即使用 [https://itdog.cn](https://itdog.cn) 测试了我的博客网站 [https://acofork.com](https://acofork.com) 发现大部分节点都为 **570** 状态码
 
 ![](/img/review-ddos-4f3b8517527460574d03479cc64655be.webp)
 
@@ -213,8 +212,8 @@ coverImage: /img/review-ddos-review-ddos-5.png
 要回答这个问题，我们首先需要知道WAF本来是防什么的。正常来说，一个网站应该是，源站脆弱，由CDN拦截大部分恶意请求，仅让正常请求流入源站。就好比你的源站有高清无码大片，你就可以写个速率限制，让单IP一秒只能请求一次，这样，恶意请求就拿不到你源站热情的高清无码大片，只能拿到CDN冰冷的拦截画面。但我们是静态，没有源站，或者说源站就是CDN。所有请求，有效或无效都是直接打到"源站"，也就是CDN上的，哪怕我们写了海外屏蔽，写了速率限制，这些也都是L7层的，攻击者仍然可以无限制的去在L4层建立TCP连接来促使CDN拒绝来自我们站点域名的服务。除非我们能够控制CDN的L4层WAF，并且设置严格的WAF规则，直接拒绝来自攻击者的TCP握手请求，才有可能逃脱最终被打死的宿命
 
 - **为什么要切Cloudflare？不是说攻击者打的是CDN吗，Cloudflare就不会被打死吗？**
-
-Cloudflare曾抵御过高达 22.2Tbps 的攻击，对于攻击我们的流量来说，完全是小菜一碟，详见：https://x.com/Cloudflare/status/1970244046946759024，[Cloudflare 2025年第三季度DDoS威胁报告——包括僵尸网络的顶尖攻击者Aisuru](https://blog.cloudflare.com/ddos-threat-report-2025-q3/?utm_source=chatgpt.com/)
+  - Cloudflare曾抵御过高达 22.2Tbps 的攻击，对于攻击我们的流量来说，完全是小菜一碟，详见：[https://x.com/Cloudflare/status/1970244046946759024](https://x.com/Cloudflare/status/1970244046946759024) 
+  - Cloudflare 2025年第三季度DDoS威胁报告——包括僵尸网络的顶尖攻击者Aisuru：[https://blog.cloudflare.com/ddos-threat-report-2025-q3/?utm_source=chatgpt.com/](https://blog.cloudflare.com/ddos-threat-report-2025-q3/?utm_source=chatgpt.com/)
 
 - **我也有网站，我要如何避免如此恐怖的DDOS攻击？**
 
@@ -249,9 +248,7 @@ Cloudflare曾抵御过高达 22.2Tbps 的攻击，对于攻击我们的流量来
 经过这四个月的攻防战，总结出以下几点：
 
 1. **免费的国内CDN并不抗打**：就算写好WAF规则，CDN并不会清退你，但是在攻击期间网站仍会处于宕机状态。除非我们有L4权限，能在TCP握手层就丢掉攻击者的连接，否则L7层的WAF规则对于这种大规模分布式攻击效果有限。
-
 2. **对于纯静态网站，防护薄弱的CDN风险很高**：如果部署在防护薄弱的CDN，攻击者拉出大流量不仅会导致网站短时间宕机，长时间不处理还会被CDN清退。
-
 3. **此种攻击级别史无前例，目前解决方案就是切换为Cloudflare CDN**：因为Cloudflare体量足够大，能够抗住如此大的DDoS攻击，并保证SLA。Cloudflare曾抵御过22.2Tbps的攻击，对于这种规模的攻击完全不在话下。
-
 4. **读者几乎不用担心自己的网站会被攻击**：此种规模的攻击明显是有组织、针对性的，攻击成本很高，几乎不可能用来泛攻击。普通网站根本没有被攻击的价值，除非你像笔者一样被"盯上"了。
+
