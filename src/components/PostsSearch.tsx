@@ -111,13 +111,71 @@ export function PostsSearch({ posts }: { posts: PostEntry[] }) {
       ) : sorted.length === 0 ? (
         <p className="text-muted-foreground">暂无文章</p>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {sorted.map((post) => (
-            <PostCard key={post.slug} post={post} />
+            <PostCardGrid key={post.slug} post={post} />
           ))}
         </div>
       )}
     </>
+  );
+}
+
+function PostCardGrid({ post }: { post: PostEntry }) {
+  return (
+    <a
+      href={`/posts/${post.slug}/`}
+      className="group block rounded-lg border p-3 sm:p-5 hover:border-primary/50 hover:shadow-sm transition-all h-full"
+    >
+      <article className="flex flex-col gap-3">
+        {post.image && (
+          <div className="-mx-3 -mt-3 sm:-mx-5 sm:-mt-5 mb-1 overflow-hidden rounded-t-lg">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={post.image}
+              alt={post.title}
+              className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+        )}
+
+        <div className="flex-1 flex flex-col gap-2">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap leading-none">
+            {post.pinned && (
+              <>
+                <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400">
+                  <Icon icon="mdi:pin" className="size-3" />
+                  置顶
+                </span>
+                <span aria-hidden>·</span>
+              </>
+            )}
+            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+              <Icon icon="mdi:calendar" className="size-3" />
+              <time dateTime={post.published}>{post.published.slice(0, 10)}</time>
+            </span>
+            {post.category && (
+              <>
+                <span aria-hidden>·</span>
+                <span className="text-xs text-muted-foreground">{post.category}</span>
+              </>
+            )}
+            {post.tags.length > 0 && (
+              <>
+                <span aria-hidden>·</span>
+                <span className="truncate text-xs text-muted-foreground">{post.tags.join(' / ')}</span>
+              </>
+            )}
+          </div>
+
+          <h2 className="text-base sm:text-lg font-semibold group-hover:text-primary transition-colors leading-snug">{post.title}</h2>
+
+          {post.description && (
+            <p className="text-sm text-muted-foreground line-clamp-2 mt-auto">{post.description}</p>
+          )}
+        </div>
+      </article>
+    </a>
   );
 }
 
