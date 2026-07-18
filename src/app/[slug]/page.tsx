@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     alternates: { canonical: url },
     openGraph: {
       type: 'article',
-      title: `posts/${slug}/`, // Giscus 使用 og:title 做 discussion 匹配
+      title: `posts/${slug}/`,
       description: post.description || undefined,
       url,
       images: post.image ? [{ url: post.image }] : undefined,
@@ -137,7 +137,6 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
           <PostBody html={post.html} />
 
-          {/* JSON-LD structured data */}
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{
@@ -148,19 +147,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                 description: post.description || undefined,
                 image: post.image || undefined,
                 datePublished: post.published || undefined,
-                author: {
-                  '@type': 'Person',
-                  name: '二叉树树',
-                  url: 'https://2x.nz/',
-                },
-                publisher: {
-                  '@type': 'Person',
-                  name: '二叉树树',
-                },
-                mainEntityOfPage: {
-                  '@type': 'WebPage',
-                  '@id': `${SITE_URL}/posts/${slug}/`,
-                },
+                author: { '@type': 'Person', name: '二叉树树', url: 'https://2x.nz/' },
+                publisher: { '@type': 'Person', name: '二叉树树' },
+                mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/posts/${slug}/` },
                 keywords: post.tags.length > 0 ? post.tags.join(', ') : undefined,
               }),
             }}
