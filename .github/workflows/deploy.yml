@@ -30,11 +30,6 @@ jobs:
 
       - run: pnpm build
 
-      - name: Prepare dist directory
-        run: |
-          cp _headers dist/
-          cp -r assets dist/assets/
-
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
