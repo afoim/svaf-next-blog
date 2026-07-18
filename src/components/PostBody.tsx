@@ -34,7 +34,7 @@ export function PostBody({ html }: { html: string }) {
 
   return (
     <div
-      className="prose prose-zinc dark:prose-invert max-w-none prose-pre:bg-[#1e1e2e] prose-code:before:content-none prose-code:after:content-none prose-img:rounded-xl prose-headings:scroll-mt-20"
+      className="prose prose-zinc dark:prose-invert max-w-none prose-pre:bg-[#1e1e2e] prose-code:before:content-none prose-code:after:content-none prose-img:rounded-xl"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

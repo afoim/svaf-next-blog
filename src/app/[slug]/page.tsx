@@ -159,7 +159,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         </article>
 
         <aside className="hidden xl:block w-[350px] flex-shrink-0 p-6 bg-muted/60 dark:bg-muted/20 rounded-lg">
-          <div className="sticky top-20 space-y-8">
+          <div className="sticky top-8 space-y-8">
             <div className="border border-border rounded-lg p-6 bg-card">
               <TableOfContents headings={headings} />
             </div>

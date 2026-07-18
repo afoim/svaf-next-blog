@@ -26,7 +26,7 @@ export function TableOfContents({ className, headings }: TableOfContentsProps) {
         const el = document.getElementById(h.id);
         if (!el) continue;
         const top = el.getBoundingClientRect().top;
-        if (top >= 76 && top < bestTop) {
+        if (top >= 8 && top < bestTop) {
           bestTop = top;
           best = h.id;
         }
@@ -39,7 +39,7 @@ export function TableOfContents({ className, headings }: TableOfContentsProps) {
           const el = document.getElementById(h.id);
           if (!el) continue;
           const top = el.getBoundingClientRect().top;
-          if (top < 76 && top > lastAboveTop) {
+          if (top < 8 && top > lastAboveTop) {
             lastAboveTop = top;
             lastAbove = h.id;
           }
