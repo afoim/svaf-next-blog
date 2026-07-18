@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import '@/styles/hljs.css';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
-import { Footer, Analytics, CookieConsent } from '@svaf/shared';
+import { Footer, Analytics, CookieConsent, SiteHeader } from '@svaf/shared';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -71,7 +71,8 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
-          <div className="flex-1 flex flex-col min-h-0">
+          <SiteHeader />
+          <div className="flex-1 flex flex-col min-h-0 pt-14">
             {children}
           </div>
           <Footer />
